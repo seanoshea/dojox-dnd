@@ -15,7 +15,7 @@ dojo.declare(
 			// summary: shifts the currently selected dnd item
 			// offset: int: the amount to bump the selection by.
 			// shiftKey: Boolean: whether or not this new selection happened when the user was holding
-    		// down the shift key
+			// down the shift key
 			var selectedNodes = this.getSelectedNodes();
 			if(selectedNodes && selectedNodes.length) {
 				// only delegate to _selectNode if at least one node is selected. If multiple nodes are selected
@@ -51,7 +51,7 @@ dojo.declare(
 			// summary: selects a node based on nodeId
 			// nodeId: String: the id of the node to select
 			// shiftKey: Boolean: whether or not this new selection happened when the user was holding
-    		// down the shift key
+			// down the shift key
 			if(!shiftKey) {
 				// only clear the selection if the user was not holding down the shift key
 				this.selectNone();
@@ -59,13 +59,13 @@ dojo.declare(
 			this._addItemClass(dojo.byId(nodeId), "Selected");
 			this.selection[nodeId] = 1;
 		},
-
+		
 		_isBoundedByBox: function(args) {
 			// summary: figures out whether certain coodinates bound a particular dom node.
 			// args: contains dom node coordinates and coordinates for the
 			// positioning of the bounding box
-			var isBounded = false, tlx, tly, brx, bry;
-			var nodeTlx = args.coords.x, nodeTly = args.coords.y, nodeBrx = args.coords.x + args.coords.w, nodeBry = args.coords.y + args.coords.h;
+			var isBounded = false, tlx, tly, brx, bry, xBounded, yBounded,
+			nodeTlx = args.coords.x, nodeTly = args.coords.y, nodeBrx = args.coords.x + args.coords.w, nodeBry = args.coords.y + args.coords.h;
 			// tlx, tly represents the x,y coordinates for the top left of the bounding box
 			// brx, bry represents the x,y coordinates for the bottom right of the bounding box
 			// nodeTlx, nodeTly represents the x,y coordinates for the top left of the dom node
@@ -86,8 +86,8 @@ dojo.declare(
 				tlx = args.endX;
 				tly = args.endY;
 			}
-			var xBounded = (nodeTlx >= tlx || nodeBrx <= brx) && (tlx <= nodeBrx && brx >= nodeTlx) || (nodeTlx <= tlx && nodeBrx >= brx);
-			var yBounded = (tly <= nodeBry && bry >= nodeTly) || (nodeBry >= bry && nodeTly <= bry);
+			xBounded = (nodeTlx >= tlx || nodeBrx <= brx) && (tlx <= nodeBrx && brx >= nodeTlx) || (nodeTlx <= tlx && nodeBrx >= brx);
+			yBounded = (tly <= nodeBry && bry >= nodeTly) || (nodeBry >= bry && nodeTly <= bry);
 			if(xBounded && yBounded) {
 				isBounded = true;
 			}
@@ -98,9 +98,9 @@ dojo.declare(
 			// summary: selects a node based on nodeId
 			// nodeId: String: the id of the node to select
 			// offset: int: the number of nodes to shift the current selection by
-			var allNodes = this.getAllNodes(), newId = nodeId;
+			var allNodes = this.getAllNodes(), newId = nodeId, node;
 			for(var i = 0, l = allNodes.length; i < l; i++) {
-				var node = allNodes[i]; 
+				node = allNodes[i]; 
 				if(node.id == nodeId) {
 					// have a match ... make sure we're not at the start or the end of the dnd set
 					if(!((offset == -1 && i == 0) || (i == l - 1 && offset == 1))) {

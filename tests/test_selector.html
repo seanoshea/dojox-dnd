@@ -19,22 +19,54 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug: true"></script>
 		<script type="text/javascript">
 			dojo.require("dojox.dnd.Selector");
-			dojo.require("dojox.dnd.BoundingBoxController");
-			var albums, bb;
-			var init = function() {
-				albums = new dojox.dnd.Selector(dojo.byId("albums"));
+			dojo.require("doh.runner");
+			var source, bb,
+			init = function() {
+				source = new dojox.dnd.Selector(dojo.byId("source"));
 				dojo.connect(dojo.doc, "onkeydown", dojo.hitch(this, function(evt) {
 					// would usually use dojo.keys.UP_ARROW/dojo.keys.DOWN_ARROW
 					// but can't seem to get that working with doh. Instead, I'm using
 					// 'u' as an indicator for up and 'd' as an indicator for down.
 					if(evt.keyCode == 85) {
-						albums.shift(-1, evt.shiftKey);
+						source.shift(-1, evt.shiftKey);
 					}
 					if(evt.keyCode == 68) {
-						albums.shift(1, evt.shiftKey);
+						source.shift(1, evt.shiftKey);
 					}
 				}));
-				bb = new dojox.dnd.BoundingBoxController({domNode: dojo.byId("boundingBox"), sources: [albums]});
+				doh.register("dojox.dnd.SelectorMixin",
+					[
+						{
+							name: "testAll", 
+							timeout: 3000, 
+							setUp: function() {
+								
+							},
+							runTest: function() {
+								var def = new doh.Deferred();
+								source._selectNode("blonde");
+								doh.assertTrue(source.getSelectedNodes().length == 1);
+								source.shift(1, true);
+								doh.assertTrue(source.getSelectedNodes().length == 2);
+								source.shift(-1);
+								doh.assertTrue(source.getSelectedNodes().length == 1);
+								source.selectAll();
+								doh.assertTrue(source.getSelectedNodes().length == 3);
+								source.selectAll({endX: 1, endY: 1, startX: 1, startY: 1});
+								doh.assertTrue(source.getSelectedNodes().length == 0);
+								source.selectAll({endX: 1000, endY: 1000, startX: 1, startY: 1});
+								setTimeout(function() {
+									source.getSelectedNodes().length == 3 ? def.callback(true) : def.errback(false);
+								}, 500);
+								return def;
+							},
+							tearDown: function() {
+								
+							}
+						}
+					]
+				);
+				doh.run();
 			};
 			dojo.addOnLoad(init);
 		</script>
@@ -42,11 +74,10 @@
 	<body>
 		<h1 id="header">Dojox DnD selector test</h1>
 		<p>Use the up/down arrows to iterate through the list after selecting one.</p>
-		<div id="albums" class="container">
+		<div id="source" class="container">
 			<div id="blonde" class="dojoDndItem">Blonde on Blonde</div>
 			<div id="highway" class="dojoDndItem">Highway 61 Revisited</div>
 			<div id="tracks" class="dojoDndItem">Blood on the Tracks</div>
 		</div>
-		<div id="boundingBox" style="display:none;"></div>
 	</body>
 </html>

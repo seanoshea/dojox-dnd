@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>dojox dnd BoundingBoxController</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug: true"></script>
+		<script type="text/javascript">
+			dojo.require("dojox.dnd.Selector");
+			dojo.require("dojox.dnd.BoundingBoxController");
+			dojo.require("doh.runner");
+			mockEvent = function(args) {
+				var evt = {
+					stopPropagation: function() {},
+					preventDefault: function() {}
+				};
+				dojo.mixin(evt, args);
+				return evt;
+			};
+			dojo.addOnLoad(function(){
+				doh.register("dojox.dnd.BoundingBoxController",
+					[
+						{ 
+							name: "testMouseDownUpCancel",
+							timeout: 1000, 
+							setUp: function() {
+								bbc = new dojox.dnd.BoundingBoxController({domNode: dojo.byId("boundingBox"), sources: []});
+							},
+							runTest: function() {
+								var def = new doh.Deferred(), res = false,
+								s = dojo.subscribe("/dojox/dnd/bounding", function() {
+									dojo.unsubscribe(s);
+									res = true;
+								});
+								bbc._onMouseDown(mockEvent({clientX: 1, clientY: 1}));
+								bbc._onMouseMove(mockEvent({clientX: 100, clientY: 100}));
+								doh.assertTrue(dojo.style(dojo.byId("boundingBox"), "display") !== "none");
+								bbc._onMouseUp(mockEvent());
+								setTimeout(function() {
+									res && dojo.style(dojo.byId("boundingBox"), "display") === "none" ? def.callback(true) : def.errback(false);
+								}, 500);
+								return def;
+							},
+							tearDown: function() {
+								
+							}
+						}
+					]
+				);
+				doh.run();
+			});
+		</script>
+	</head>
+	<body>
+		<div id="boundingBox"></div>
+	</body>
+</html>

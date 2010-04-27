@@ -32,7 +32,7 @@ dojo.declare(
 				// listen for "/dojox/dnd/bounding" events eminating from the bounding box.
 				// for each of the dojox.dnd.selectors passed in args.
 				dojo.subscribe("/dojox/dnd/bounding", item, "selectAll");
-			})
+			});
 			this.domNode = args.domNode;
 		},
 		
@@ -74,6 +74,7 @@ dojo.declare(
 		 	// whether the user was drawing a bounding box and publishes to the
 		 	// "/dojox/dnd/bounding" topic if the user is finished drawing their bounding box.
 			// evt: Object: the mouse event which caused this callback to fire.
+			console.warn("_onMouseUp ", this._isMouseDown(), this._endX, this._endY);
 			if(this._isMouseDown() && this._endX != null && this._endY != null) {
 				// the user has moused up ... tell the selector to check to see whether
 				// any nodes within the bounding box need to be selected.
