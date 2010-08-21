@@ -2,25 +2,17 @@
 <html>
 	<head>
 		<title>Dojox DnD selector test</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../../dojo/tests/dnd/dndDefault.css";
 			body { padding: 20px; }
 		</style>
-		<style title="text/css">
-			#boundingBox {
-				background:#999;
-				border:1px solid #2B2B2B;
-				opacity:0.6;
-				position:absolute;
-				z-index:19999;
-			}
-		</style>
 		<script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug: true"></script>
 		<script type="text/javascript">
 			dojo.require("dojox.dnd.Selector");
 			dojo.require("doh.runner");
-			var source, bb,
+			var source,
 			init = function() {
 				source = new dojox.dnd.Selector(dojo.byId("source"));
 				dojo.connect(dojo.doc, "onkeydown", dojo.hitch(this, function(evt) {
@@ -44,7 +36,7 @@
 							},
 							runTest: function() {
 								var def = new doh.Deferred();
-								source._selectNode("blonde");
+								source.selectNode("blonde");
 								doh.assertTrue(source.getSelectedNodes().length == 1);
 								source.shift(1, true);
 								doh.assertTrue(source.getSelectedNodes().length == 2);
@@ -52,9 +44,9 @@
 								doh.assertTrue(source.getSelectedNodes().length == 1);
 								source.selectAll();
 								doh.assertTrue(source.getSelectedNodes().length == 3);
-								source.selectAll({endX: 1, endY: 1, startX: 1, startY: 1});
+								source.selectByBBox(0, 0, 0, 0, false);
 								doh.assertTrue(source.getSelectedNodes().length == 0);
-								source.selectAll({endX: 1000, endY: 1000, startX: 1, startY: 1});
+								source.selectAll(1000, 1000, 1, 1, true);
 								setTimeout(function() {
 									source.getSelectedNodes().length == 3 ? def.callback(true) : def.errback(false);
 								}, 500);

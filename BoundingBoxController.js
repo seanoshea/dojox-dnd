@@ -58,13 +58,22 @@ dojo.declare(
 			this.domNode = null;
 		},
 		
-		boundingBoxIsViable: function(){
+		shouldStartDrawingBox: function(evt){
+			// summary: Override-able by the client as an extra check to ensure that a bounding
+			// box should begin to be drawn. If the client has any preconditions to when a
+			// bounding box should be drawn, they should be included in this method.
+			// evt: Object: the mouse event which caused this callback to fire.
+			return true;
+		},
+		
+		boundingBoxIsViable: function(evt){
 			// summary: Override-able by the client as an extra check to ensure that a bounding
 			// box is viable. In some instances, it might not make sense that
 			// a mouse down -> mouse move -> mouse up interaction represents a bounding box.
 			// For example, if a dialog is open the client might want to suppress a bounding
 			// box. This function could be used by the client to ensure that a bounding box is only
 			// drawn on the document when certain conditions are met.
+			// evt: Object: the mouse event which caused this callback to fire.
 			return true;
 		},
 		
@@ -72,8 +81,8 @@ dojo.declare(
 			// summary: Executed when the user mouses down on the document. Resets the
 			// this._startX and this._startY member variables.
 			// evt: Object: the mouse event which caused this callback to fire.
-			if(dojo.mouseButtons.isLeft(evt)){
-				if(this._startX === null){
+			if(this.shouldStartDrawingBox(evt) && dojo.mouseButtons.isLeft(evt)){
+				if(this._startX == null){
 					this._startX = evt.clientX;
 					this._startY = evt.clientY;
 				}
@@ -99,7 +108,7 @@ dojo.declare(
 		 	// whether the user was drawing a bounding box and publishes to the
 		 	// "/dojox/dnd/bounding" topic if the user is finished drawing their bounding box.
 			// evt: Object: the mouse event which caused this callback to fire.
-			if(this._endX !== null && this.boundingBoxIsViable()){
+			if(this._endX !== null && this.boundingBoxIsViable(evt)){
 				// the user has moused up ... tell the selector to check to see whether
 				// any nodes within the bounding box need to be selected.
 				dojo.publish("/dojox/dnd/bounding", [this._startX, this._startY, this._endX, this._endY]);
@@ -112,7 +121,8 @@ dojo.declare(
 			if(this._startX !== null){
 				dojo.disconnect(this.events.pop());
 				dojo.style(this.domNode, "display", "none");
-				this._startX = this._endX = null;
+				this._startX = null;
+				this._endX = null;
 			}
 		},
 		

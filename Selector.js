@@ -99,7 +99,7 @@ dojo.declare(
 			//		Right coordinate of the bounding box
 			//	bottom: Number:
 			//		Bottom coordinate of the bounding box
-			var c = dojo.coords(node), t;
+			var c = dojo.position(node), t;
 			// normalize input
 			if(left > right){
 				t = left;
