@@ -38,6 +38,7 @@
 							name: "testMouseDownUp",
 							timeout: 1000, 
 							setUp: function() {
+								source.conservative = false;
 								bbc = new dojox.dnd.BoundingBoxController([source], dojo.byId("boundingBox"));
 							},
 							runTest: function() {
@@ -47,13 +48,12 @@
 									res = true;
 								});
 								bbc._onMouseDown(mockEvent({clientX: 1, clientY: 1}));
-								bbc._onMouseMove(mockEvent({clientX: 500, clientY: 500}));
+								bbc._onMouseMove(mockEvent({clientX: 1000, clientY: 1000}));
 								doh.assertTrue(dojo.style(dojo.byId("boundingBox"), "display") !== "none");
 								bbc._onMouseUp(mockEvent());
 								doh.assertTrue(source.getSelectedNodes().length === 3);
 								setTimeout(function() {
 									res && dojo.style(dojo.byId("boundingBox"), "display") === "none" ? def.callback(true) : def.errback(false);
-									true ? def.callback(true) : def.errback(false);
 								}, 500);
 								return def;
 							},

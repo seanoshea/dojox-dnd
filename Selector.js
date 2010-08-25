@@ -6,6 +6,8 @@ dojo.declare(
 	"dojox.dnd.Selector",
 	dojo.dnd.Selector,
 	{
+		conservative: true,
+		
 		isSelected: function(node){
 			//	summary:
 			//		checks if node is selected
@@ -99,19 +101,7 @@ dojo.declare(
 			//		Right coordinate of the bounding box
 			//	bottom: Number:
 			//		Bottom coordinate of the bounding box
-			var c = dojo.position(node), t;
-			// normalize input
-			if(left > right){
-				t = left;
-				left = right;
-				right = t;
-			}
-			if(top > bottom){
-				t = top;
-				top = bottom;
-				bottom = t;
-			}
-			return c.x >= left && c.x + c.w <= right && c.y >= top && c.y + c.h <= bottom;	// Boolean
+			return this.conservative ? this._conservativeBBLogic(node, left, top, right, bottom) : this._liberalBBLogic(node, left, top, right, bottom);
 		},
 		
 		shift: function(toNext, add) {
@@ -154,6 +144,61 @@ dojo.declare(
 			}
 			// if we don't get a match, the newId defaults to the currently selected node
 			return newId;
+		},
+		
+		_conservativeBBLogic: function(node, left, top, right, bottom) {
+			//	summary:
+			//		logic which determines whether a node is bounded by the
+			//		left,top,right,bottom parameters. This function returns true
+			//		only if the coordinates of the node parameter are fully
+			//		encompassed by the box determined by the left, top, right, bottom parameters.
+			var c = dojo.coords(node), t;
+			// normalize input
+			if(left > right){
+				t = left;
+				left = right;
+				right = t;
+			}
+			if(top > bottom){
+				t = top;
+				top = bottom;
+				bottom = t;
+			}
+			return c.x >= left && c.x + c.w <= right && c.y >= top && c.y + c.h <= bottom;	// Boolean
+		},
+		
+		_liberalBBLogic: function(node, left, top, right, bottom) {
+			//	summary:
+			//		logic which determines whether a node is bounded by the
+			//		left,top,right,bottom parameters. Allows for the case where
+			//		any section of the box determined by the left,top,right,bottom parameters
+			//		overlapping the coordinates of the node parameter constitutes a true
+			//		return value
+			var c = dojo.position(node), xBounded, yBounded, tlx, tly, brx, bry,
+			nodeTlx = c.x, nodeTly = c.y, nodeBrx = c.x + c.w, nodeBry = c.y + c.h;
+			// tlx, tly represents the x,y coordinates for the top left of the bounding box
+			// brx, bry represents the x,y coordinates for the bottom right of the bounding box
+			// nodeTlx, nodeTly represents the x,y coordinates for the top left of the dom node
+			// nodeBrx, nodeBry represents the x,y coordinates for the bottom right of the dom node
+			if(left < right) {
+				tlx = left;
+				tly = top;
+			} else {
+				tlx = right;
+				tly = bottom;
+			}
+			if(top < bottom) {
+				brx = right;
+				bry = bottom;
+			} else {
+				brx = left;
+				bry = top;
+				tlx = right;
+				tly = bottom;
+			}
+			xBounded = (nodeTlx >= tlx || nodeBrx <= brx) && (tlx <= nodeBrx && brx >= nodeTlx) || (nodeTlx <= tlx && nodeBrx >= brx);
+			yBounded = (tly <= nodeBry && bry >= nodeTly) || (nodeBry >= bry && nodeTly <= bry);
+			return xBounded && yBounded;	// Boolean	
 		}
 	}
 );

@@ -36,6 +36,7 @@
 							},
 							runTest: function() {
 								var def = new doh.Deferred();
+								source.conservative = false;
 								source.selectNode("blonde");
 								doh.assertTrue(source.getSelectedNodes().length == 1);
 								source.shift(1, true);
